@@ -279,8 +279,10 @@ public class Apriori{
 
 	public static void main(String args[]){
 		//D100kT10N1k.txt D10kT10N1k.txt  D1kT10N500.txt  Mushroom.txt
+		String filename = args[0];
+		String output_filename = filename.split(".txt")[0]+"_result.txt";
 		try{
-			PrintStream out = new PrintStream(new FileOutputStream("result/D1kT10N500_result.txt"));
+			PrintStream out = new PrintStream(new FileOutputStream(output_filename));
 			System.setOut(out);
 		}catch(IOException ex){
 			ex.printStackTrace();
