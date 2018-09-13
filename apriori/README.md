@@ -1,14 +1,14 @@
 # Dataset:
-> transaction database
+> transaction database<br />
 > format: a line means a transaction data, each item seperated by space
 
 # Command:
-> compile: javac Apriori.java
+> compile: javac Apriori.java<br />
 > excute: java Apriori filename.txt
 
 # Result:
 > the result will output to the file named filename_result.txt
-## Output infromation:
+> ## Output infromation:
 > - File (input filename)
 > - min support
 > - amount of frequent itemesets
