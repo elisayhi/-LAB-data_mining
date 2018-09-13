@@ -73,7 +73,7 @@ public class Dbscan{
 			ex.printStackTrace();
 		}
 
-		System.out.println("no\tx\ty\ttype\tcluster");	//title
+		System.out.println("no\tattr1\tattr2\ttype\tcluster");	//title
 
 		for(Data d : DB){
 			System.out.print(d.get_no()+"\t"+d.get_attr(1)+"\t"+d.get_attr(2)+"\t");
