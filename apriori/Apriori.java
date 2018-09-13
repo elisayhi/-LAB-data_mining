@@ -287,7 +287,6 @@ public class Apriori{
 		}catch(IOException ex){
 			ex.printStackTrace();
 		}
-		String filename = "Dataset/D1kT10N500.txt";
 		System.out.println("File: " + filename);
 
 		for(float i=0.01f; i>=0.001; i-=0.001){

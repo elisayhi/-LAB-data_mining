@@ -15,3 +15,4 @@ amount of frequent itemesets
 runtime and memory of generating frequent itemsets
 amount of association rules
 runtime and memory of generating association rules
+
