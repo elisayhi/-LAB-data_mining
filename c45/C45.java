@@ -192,7 +192,7 @@ public class C45{
 	//-------------Gain-end----------------
 	//-------------C45-start----------------
 	public static List<String> find_best_split_point(Attribute attr, Attribute category){
-		List<Long> data;
+		List<Long> data = new ArrayList<Long>();
 		if(attr.data.get(0).matches("[\\d]*-[\\d]*-[\\d]*")){
 			List<String> tmp = C45_util.remove_minus_sign(attr.data);
 			data = C45_util.copy_strList_as_longList(tmp);
@@ -203,11 +203,10 @@ public class C45{
 		}else{
 			data = C45_util.copy_strList_as_longList(attr.data);
 		}
-		
+        data = C45_util.gen_split_point(data, category);
+	    
 		double max_gainratio = 0;
 		long max_split_num = 0;
-		C45_util.delete_repetition(data);
-		Collections.sort(data);
 		//System.out.println(attr.get_name());
 		for(long i : data){
 			//System.out.println("split point: "+i);
@@ -219,6 +218,7 @@ public class C45{
 				max_split_num = i;
 			}
 		}
+		//System.out.println("3");
 		//Attribute ret = C45_util.split_attr_into_2classes(attr, max_split_num);
 		List<String> ret = new ArrayList<String>();
 		ret.add(String.valueOf(max_gainratio));
@@ -231,8 +231,9 @@ public class C45{
 		long[] split_points = new long[attrs.size()];
 		for(int i=0; i<attrs.size(); i++){
 			Attribute attr = attrs.get(i);
+			//System.out.println(i);
 			if(attr.data.get(0).matches("\\d.*")){		//continuous
-				System.out.println(attr.data.get(0));
+				//System.out.println(attr.data.get(0));
 				List<String> max = find_best_split_point(attr, category);
 				gainratios[i] = Double.parseDouble(max.get(0));
 				split_points[i] = Long.parseLong(max.get(1));
@@ -319,6 +320,7 @@ public class C45{
 		List<List<Attribute>> subdatasets = split_attrs_by_value(non_c_attrs, max_gain_attr_index, category);
 		node.set_name(non_c_attrs.get(max_gain_attr_index).get_name());
 		for(int i=0; i<values.size(); i++){
+            //System.out.println(values.get(i));
 			node.add_edge(values.get(i));
 			Attribute new_cate = subdatasets.get(i).remove(subdatasets.get(i).size()-1);
 			node.add_child(c45_algo(subdatasets.get(i), new_cate));
@@ -357,10 +359,13 @@ public class C45{
 		return accuracy;
 	}
 	//-------------testing-end----------------
+	//-------------main-start----------------
 
 	public static void main(String args[]){
+        String input_filename = "c45/Dataset/CUSTOMER.TXT";
+        String output_filename = "c45/result/result.txt";
 		try{
-			PrintStream out = new PrintStream(new FileOutputStream("c45/result/2.txt"));
+			PrintStream out = new PrintStream(new FileOutputStream(output_filename));
 			//PrintStream out = new PrintStream(new FileOutputStream("result/C50S10T2.5N10000_result.txt"));
 			System.setOut(out);
 		}catch(IOException ex){
@@ -368,41 +373,36 @@ public class C45{
 		}
 
 
-		List<Attribute> attributes = readFile("c45/data/CUSTOMER.TXT");
-		//List<Attribute> attributes = readFile("c45/data/test2.txt");//------------debug
-
+		List<Attribute> attributes = readFile(input_filename);
+	    
+        //let the last Attribute be the categorical attribute
 		int category_index = attributes.size()-3;
 		Attribute category = attributes.remove(category_index);
-		attributes.add(category);	//last on is the categorical attribute;
+		attributes.add(category);
 
 		List<int[]> testingset_indexes = new ArrayList<int[]>();
 		Util.gen_testing_index(testingset_indexes, 3);
-		//for(int i=0; i<testingset_indexes.size(); i++){
-			int i=2;
+        
+		for(int i=1; i<testingset_indexes.size(); i++){
+			//int i=2;
+            System.out.print("testing set: ");
+			Util.print_arr(testingset_indexes.get(i));
 			List<List<Attribute>> test_train = devide_train_test(attributes, testingset_indexes.get(i));
 			List<Attribute> testing_dataset = test_train.get(0);
 			List<Attribute> training_dataset = test_train.get(1);
-
-			//-------------debug
-			//System.out.println(training_dataset.size());
-			//-------------debug
-
 
 			Node root = c45_algo(training_dataset.subList(5, training_dataset.size()-1), training_dataset.get(training_dataset.size()-1));
 			root.print_subtree();
 
 			///testing
 			double accu = test(testing_dataset.subList(5, testing_dataset.size()-1), testing_dataset.get(testing_dataset.size()-1), root);
-			Util.print_arr(testingset_indexes.get(i));
 			System.out.println(accu);
 			//break;
-		//}
+		}
 
 		//------------test
 		//Node root = ID3(attributes.subList(0,attributes.size()-1), attributes.get(attributes.size()-1));
 		//root.print_subtree();
-
-
-
 	}
+	//-------------main-end----------------
 }

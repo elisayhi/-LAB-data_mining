@@ -6,12 +6,54 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class C45_util{
-	public static void delete_repetition(List<Long> arr){
-		Set<Long> items = new HashSet<>();
-		items.addAll(arr);
-		arr.clear();
-		arr.addAll(items);
-	}
+    public static Attribute get_class_of_particular_value(List<Long> arr, Attribute category, Long val){
+        List<String> remain_class = new ArrayList<String>();
+        for(int i=0; i<arr.size(); i++){
+            if(arr.get(i)!=val) continue;
+            remain_class.add(category.data.get(i));
+        }
+        Attribute ret = new Attribute(category.get_name(), category.get_possible_values());
+        ret.data = remain_class;
+        return ret;
+    }
+
+    public static String get_class_of_attr(List<Long> arr, Attribute category, Long val){
+        return C45.get_most_frequent_class(get_class_of_particular_value(arr, category, val));
+    }
+
+    public static void sort_arr_n_class(List<Long> nonrepeat_arr, List<String> corresponding_class){
+        List<Long> sorted_arr = new ArrayList<Long>(nonrepeat_arr);
+        List<String> sorted_class = new ArrayList<String>();
+        Collections.sort(sorted_arr);
+        for(Long x : sorted_arr){
+            sorted_class.add(corresponding_class.get(nonrepeat_arr.indexOf(x)));
+        }
+        nonrepeat_arr = sorted_arr;
+        corresponding_class = sorted_class;
+    }
+
+    public static List<Long> gen_split_point(List<Long> arr, Attribute category){
+        List<Long> arr_nonrepeat = new ArrayList<Long>();
+        List<String> corresponding_class = new ArrayList<String>();
+
+        //delete repetition and sort
+        for(Long x : arr){
+            if(arr_nonrepeat.contains(x)) continue;
+            arr_nonrepeat.add(x);
+            corresponding_class.add(get_class_of_attr(arr, category, x));
+        }
+        sort_arr_n_class(arr_nonrepeat, corresponding_class);
+
+        //get the point to split
+        List<Long> split_points = new ArrayList<Long>();
+        for(int i=0; i<arr_nonrepeat.size()-1; i++){
+            if(corresponding_class.get(i)==corresponding_class.get(i+1)) continue;
+            split_points.add(arr_nonrepeat.get(i));
+        }
+        split_points.add(arr_nonrepeat.get(arr_nonrepeat.size()-1));
+
+        return split_points;
+    }
 
 	public static String remove_minus_sign(String str){
 		String[] split = str.split("-");
